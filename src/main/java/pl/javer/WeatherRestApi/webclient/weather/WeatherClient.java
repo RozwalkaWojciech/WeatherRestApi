@@ -2,6 +2,8 @@ package pl.javer.WeatherRestApi.webclient.weather;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import pl.javer.WeatherRestApi.model.WeatherDto;
+import pl.javer.WeatherRestApi.webclient.weather.dto.OpenWeatherWeatherDto;
 
 @Component
 public class WeatherClient {
@@ -10,10 +12,16 @@ public class WeatherClient {
     private static final String API_KEY = "9475ef3eddb4ee346fa3072af4de6e99";
     private RestTemplate restTemplate = new RestTemplate();
 
-    public String getWeatherForCity(String city) {
-        return callGetMethod("weather?q={city}&appid={apiKey}&units=metric&lang=pl",
-                String.class,
+    public WeatherDto getWeatherForCity(String city) {
+        OpenWeatherWeatherDto openWeatherWeatherDto = callGetMethod("weather?q={city}&appid={apiKey}&units=metric&lang=pl",
+                OpenWeatherWeatherDto.class,
                 city, API_KEY);
+        return WeatherDto.builder()
+                .temperature(openWeatherWeatherDto.getMain().getTemp())
+                .pressure(openWeatherWeatherDto.getMain().getPressure())
+                .humidity(openWeatherWeatherDto.getMain().getHumidity())
+                .windSpeed(openWeatherWeatherDto.getWind().getSpeed())
+                .build();
     }
 
     public String getForecast(double lat, double lon) {
